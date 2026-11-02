@@ -1,0 +1,479 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Galme · 20 minutes par jour</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;600;700&family=Young+Serif&display=swap" rel="stylesheet">
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);--bg:#eef0f7;--card:#fff;--tx:#151a33;--mu:#646b86;--ac:#0d7c85;--ac2:#c47f12;--ok:#217a4a;--ko:#b3342b;--bd:#d9dcea;color-scheme:light}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0d1124;--card:#171c36;--tx:#eceef8;--mu:#99a0bd;--ac:#4fc4cc;--ac2:#f0b24a;--ok:#6cc690;--ko:#ef8077;--bd:#2a3158;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0d1124;--card:#171c36;--tx:#eceef8;--mu:#99a0bd;--ac:#4fc4cc;--ac2:#f0b24a;--ok:#6cc690;--ko:#ef8077;--bd:#2a3158;color-scheme:dark}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.5 Figtree,system-ui,sans-serif}
+main{max-width:640px;margin:0 auto;padding:16px 16px 90px}
+nav{position:fixed;left:0;right:0;bottom:0;display:flex;justify-content:center;gap:4px;background:var(--card);border-top:1px solid var(--bd);padding:8px 8px calc(8px + env(safe-area-inset-bottom,0px))}
+nav button{flex:1;max-width:200px;border:0;background:none;color:var(--mu);font:600 15px Figtree,sans-serif;padding:10px;border-radius:10px;cursor:pointer}
+nav button.on{background:var(--ac);color:var(--bg)}
+button:focus-visible,input:focus-visible,summary:focus-visible{outline:3px solid var(--ac2);outline-offset:2px}
+h1{font:400 34px/1.1 "Young Serif",Georgia,serif;margin:8px 0 4px}
+h2{font:400 22px "Young Serif",Georgia,serif;margin:0 0 8px}
+.mu{color:var(--mu)}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:16px 0}
+.st{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:12px;text-align:center}
+.st b{display:block;font:400 28px "Young Serif",Georgia,serif;color:var(--ac)}
+.st:first-child b{color:var(--ac2)}
+.btn{display:block;width:100%;border:0;border-radius:14px;background:var(--ac);color:var(--bg);font:700 17px Figtree,sans-serif;padding:15px;cursor:pointer;margin-top:10px}
+.btn.alt{background:var(--card);color:var(--tx);border:1px solid var(--bd)}
+.box{background:var(--card);border:1px solid var(--bd);border-radius:18px;padding:20px;margin-top:12px}
+.big{font:400 40px/1.15 "Young Serif",Georgia,serif;text-align:center;margin:18px 0;overflow-wrap:anywhere}
+.big.s{font-size:26px}
+.lab{text-align:center;color:var(--mu);font-size:14px}
+.ch{display:block;width:100%;text-align:left;background:var(--bg);color:var(--tx);border:2px solid var(--bd);border-radius:12px;padding:13px 14px;font:600 16px Figtree,sans-serif;margin-top:8px;cursor:pointer}
+.ch.ok{border-color:var(--ok);background:color-mix(in srgb,var(--ok) 18%,var(--bg))}
+.ch.ko{border-color:var(--ko);background:color-mix(in srgb,var(--ko) 18%,var(--bg))}
+input[type=text],input[type=search]{width:100%;font:600 18px Figtree,sans-serif;padding:13px;border-radius:12px;border:2px solid var(--bd);background:var(--bg);color:var(--tx)}
+.bar{height:8px;background:var(--bd);border-radius:8px;overflow:hidden;margin:4px 0 0}
+.bar i{display:block;height:100%;background:var(--ac2);width:0}
+.top{display:flex;justify-content:space-between;font-size:14px;color:var(--mu)}
+.fb{margin-top:12px;font-weight:700}
+.fb.ok{color:var(--ok)}.fb.ko{color:var(--ko)}
+details{background:var(--card);border:1px solid var(--bd);border-radius:14px;margin-top:10px;padding:4px 14px}
+summary{cursor:pointer;font-weight:700;padding:10px 0}
+table{width:100%;border-collapse:collapse;margin:8px 0 12px}
+td{padding:6px 4px;border-top:1px solid var(--bd);vertical-align:top}
+td:first-child{font:400 17px "Young Serif",Georgia,serif;width:46%;overflow-wrap:anywhere}
+.dot{display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--bd);margin-right:6px}
+.dot.on{background:var(--ac2)}.dot.hi{background:var(--ok)}
+.note{font-size:15px;color:var(--mu)}
+</style>
+</head>
+<body>
+<main id="app"></main>
+<nav>
+<button data-t="home" class="on">Séance</button>
+<button data-t="learn">Leçons</button>
+<button data-t="dico">Dico</button>
+</nav>
+<script>
+const U=["Pronoms","Grammaire et petits mots","Verbes","Salutations et mots du quotidien","Noms et adjectifs","Phrases"];
+const N=[
+"<b>Ena</b> couvre « moi/je » et mes appartenances. À l’oral, <i>ena</i> peut s’abréger en « e- » (<i>e-kora lio sivo</i>) ; à l’écrit formel, on garde <b>ena</b>. <b>Siva</b> est une variante de <b>sivo</b>.",
+"Ordre de la phrase : <b>sujet + verbe + complément</b>. <b>sha</b> exprime le contraire (<i>amora-sha</i>). <b>pre-</b> (passé) et <b>fu-</b> (futur) se placent avant le verbe ; <b>-vo</b> marque le conditionnel ; <b>-ko</b> pose la question, après le verbe. <b>lano</b> = ma/mon, <b>rae</b> = sa/son. Les adjectifs se placent <b>avant</b> le nom (<i>varo-mona</i> = grande monnaie). Un mot peut changer de terminaison sans changer de sens (funizi, funiza, funizo, funizu) : c’est pour que ça sonne bien à l’oreille.",
+"Les terminaisons peuvent varier sans changer le sens. Exemples : <i>pre-daroke</i> (a donné), <i>fu-sagne</i> (saura). À l’oral, <i>daroke</i> peut devenir <i>droké</i>.",
+"Les mots de politesse et de tous les jours.",
+"L’adjectif se place toujours avant le nom.",
+"Des phrases entières pour voir tout ça en action."
+];
+const P=`<b>Prononciation.</b> La lettre <b>n</b> se prononce comme un H aspiré : <i>ena</i> se dit « eha », <i>lano</i> se dit « laho ». La lettre <b>n</b> est le vrai N : <i>nasamora</i>, <i>bambino</i>, <i>pokoselnar</i>, <i>saë</i>.`;
+/*const R=`ena|moi / je|0
+sivo|toi / tu|0
+narai|il / elle / on|0
+nosu|nous|0
+vosu|vous|0
+lorai|ils / elles|0
+sha|non / pas / faux|1
+pre-|passé|1
+fu-|futur|1
+-vo|conditionnel|1
+-ko|question|1
+lano|mon / ma / me|1
+rae|son / sa / à lui / à elle|1
+lanoslo|notre / dans notre|1
+o|comme / avec / à|1
+bi|que|1
+eda|et|1
+odia|ou|1
+thoda|mais|1
+zebo|pour|1
+skoro bi|étant donné que|1
+bardio|grâce à|1
+ïa|le / la|1
+vi|oui / vrai / bien / bon|1
+eh|quoi|1
+saë|ça / ce / cette / cet|1
+lazo|pourquoi|1
+seran|certains|1
+ilie|être|2
+lio|avoir|2
+saroke|venir|2
+varoka|aller|2
+loroke|faire / travailler|2
+savara|savoir / connaître|2
+sagike|savoir|2
+kanora|comprendre / pouvoir|2
+devora|devoir|2
+vramdra|prendre|2
+emvrare|acheter|2
+vendre|vendre|2
+daroke|donner|2
+amora|aimer|2
+maïka|manquer|2
+yono|empêcher|2
+spozi|parler|2
+kala|appeler|2
+rigaka|diriger|2
+funizi|devenir|2
+kuye|dire|2
+selore|dire|2
+malo|penser|2
+dormara|se reposer|2
+hesidare|hésiter|2
+tsushima|dominer|2
+zhoyama|bonjour|3
+viwansaj|bonsoir|3
+vayara sola pazo|bonne nuit|3
+ïasamora|au revoir|3
+chi|merci|3
+selami|s’il te plaît|3
+ehisarok|bienvenue|3
+vrayama|vraiment|3
+nuna|maintenant|3
+zolo|seul|3
+poko|un peu|3
+mona|argent / monnaie|4
+varo|grand|4
+zhomer|la loi|4
+sosiede|la société|4
+fayida|échec / faillite|4
+fela|chat|4
+kora|cœur|4
+luna|lune|4
+noxe|nuit|4
+moti|mot|4
+dia|dieu|4
+fozel|peuple|4
+selzis|femme|4
+giozo|homme|4
+bambiïko|bébé|4
+ami|ami|4
+pi|pied|4
+cavu|fesses|4
+paffo|zizi|4
+pokoselïar|micronation|4
+franzi|français|4
+bela|beau / belle|4
+spezo|spécial|4
+dezira|désiré|4
+shapagika|impossible|4
+ena amora siva|je t’aime|5
+ena amora-sha siva|je ne t’aime pas|5
+ena amora-ko siva ?|je t’aime ?|5
+siva maïka lano|tu me manques|5
+siva kora ilie bela bela|son cœur est magnifique|5
+ena kala Sacha|je m’appelle Sacha|5
+siva kanora-ko ?|comprends-tu ?|5
+ena spozi vi|je parle bien|5
+vosu spozi-ko ?|vous parlez ?|5
+siva amora eh-ko ?|tu aimes quoi ?|5
+saë eh saë-ko ?|c’est quoi ça ?|5
+saë ilie lano fozel|ça, c’est mon peuple|5
+thoda ena malo malo ena|mais je pense par moi-même|5
+ena fu-saroke nuna, devora sha hesidare|je viens maintenant, pas besoin d’hésiter|5
+narai pre-daroke sivo mona, thodo siva pre-vramdra sha|il t’a donné ton argent, mais tu ne l’as pas pris|5
+dia zolo fu-sagike|dieu seul saura|5
+ena ve-sela zebo san|je voudrais ceci|5
+ena tsushima sivo|je te domine|5
+ena poko spozi ïa Galme, thoda, ena vi spozi ïa franzi|je parle un peu le galme, mais je parle bien le français|5`;*/
+const R=`ena|moi / je|0
+sivo|toi / tu|0
+narai|il / elle / on|0
+josu|nous|0
+vosu|vous|0
+lorai|ils / elles|0
+oni|il/lui|0
+ona|elle|0
+sha|non / pas / faux|1
+pre-|passé|1
+fu-|futur|1
+-vo (ou ve-)|conditionnel|1
+-ko|question|1
+lano|mon / ma / me|1
+rae|son / sa / à lui / à elle|1
+lanoslo|notre / dans notre|1
+o|comme / avec / à|1
+bi|que|1
+eda|et|1
+odia|ou|1
+thoda|mais|1
+zebo|pour|1
+skoro bi|étant donné que|1
+bardio|grâce à|1
+na|le / la|1
+vi|oui / vrai / bien / bon|1
+eh|quoi|1
+san|ça / ce / cette / cet|1
+lazo|pourquoi|1
+seran|certains|1
+durama|durant/pendant|1
+ilie|être|2
+lio|avoir|2
+saroke|venir|2
+varoka|aller|2
+loroke|faire / travailler|2
+sagne|savoir|2
+sogno|personne|2
+kanora (kenara)|comprendre / pouvoir|2
+devora|devoir|2
+vramdra|prendre|2
+emvrare|acheter|2
+katya|couper|2
+vendre|vendre|2
+daroke|donner|2
+amora|aimer|2
+manka|manquer|2
+yono|empêcher|2
+spozi|parler|2
+kala|appeler|2
+rigna|diriger|2
+funizi|devenir|2
+kuye|dire|2
+selore|dire|2
+malo|penser|2
+dormara|se reposer|2
+najai|cette|2
+hesidare|hésiter|2
+tsushima|dominer|2
+zhoyama|bonjour|3
+viwansaj|bonsoir|3
+vayara sola pazo|bonne nuit|3
+sola|soleil|3
+pazo|paix|3
+vayara|résultat|3
+nasamora|au revoir|3
+chi|merci|3
+selami|s’il te plaît|3
+ehisarok|bienvenue|3
+vrayama|vraiment|3
+nuna|maintenant|3
+zolo|seul|3
+poko|un peu/petit|3
+sali-vuro|à lui|3
+mona|argent / monnaie|4
+varo|grand|4
+zhomer|la loi|4
+sosiede|la société|4
+lliochi|yeux|4
+fayida|échec / faillite|4
+fela|chat|4
+kora|cœur|4
+luna|lune|4
+noxe|nuit|4
+moti|mot|4
+dia|dieu|4
+fozel|peuple|4
+selzis|femme|4
+gnozo|homme|4
+bambino|bébé|4
+ami|ami|4
+pi|pied|4
+cavu|fesses|4
+paffo|zizi|4
+pokoselnar|micronation|4
+selnar|pays|4
+franzi|français|4
+bela|beau / belle|4
+spezo|spécial|4
+deziro|désiré|4
+puto|pute|4
+zald|fils|4
+shapagna|impossible / pas permi|4
+ena amora siva|je t’aime|5
+ena amora-sha siva|je ne t’aime pas|5
+ena amora-ko siva ?|je t’aime ?|5
+siva manka lano|tu me manques|5
+siva kora ilie bela bela|son cœur est magnifique|5
+ena kala Sacha|je m’appelle Sacha|5
+siva kanora-ko ?|comprends-tu ?|5
+ena spozi vi|je parle bien|5
+vosu spozi-ko ?|vous parlez ?|5
+siva amora eh-ko ?|tu aimes quoi ?|5
+san eh san-ko ?|c’est quoi ça ?|5
+san ilie lano fozel|ça, c’est mon peuple|5
+thoda ena malo malo ena|mais je pense par moi-même|5
+ena fu-saroke nuna, devora sha hesidare|je viens maintenant, pas besoin d’hésiter|5
+narai pre-daroke sivo mona, thodo siva pre-vramdra sha|il t’a donné ton argent, mais tu ne l’as pas pris|5
+dia zolo fu-sagne|dieu seul saura|5
+ena ve-sela zebo san|je voudrais ceci|5
+ena tsushima sivo|je te domine|5
+ena poko spozi na Galme, thoda, ena vi spozi na franzi|je parle un peu le galme, mais je parle bien le français|5`;
+const C=R.split("\n").map((l,i)=>{const p=l.split("|");return{id:i,g:p[0],f:p[1],u:+p[2]}});
+const TD=["Pronom","Particule","Verbe","Expression","Nom","Phrase"];
+const TX={vi:"Adverbe",eh:"Pronom",san:"Pronom",lazo:"Adverbe",seran:"Pronom",sogno:"Nom",najai:"Pronom",sola:"Nom",pazo:"Nom",vayara:"Nom",vrayama:"Adverbe",nuna:"Adverbe",zolo:"Adjectif",poko:"Adverbe","sali-vuro":"Pronom",varo:"Adjectif",bela:"Adjectif",spezo:"Adjectif",deziro:"Adjectif",shapagna:"Adjectif",franzi:"Adjectif"};
+const TO=["Pronom","Verbe","Nom","Adjectif","Adverbe","Particule","Expression","Phrase"],TT={Pronom:"Pronoms",Verbe:"Verbes",Nom:"Noms",Adjectif:"Adjectifs",Adverbe:"Adverbes",Particule:"Particules et petits mots",Expression:"Expressions",Phrase:"Phrases"};
+C.forEach(c=>c.t=TX[c.g]||TD[c.u]);
+let S={c:{},d:{}};
+try{S=JSON.parse(localStorage.getItem("galme2"))||S}catch(e){}
+const save=()=>{try{localStorage.setItem("galme2",JSON.stringify(S))}catch(e){}};
+const day=()=>Math.floor((Date.now()-new Date().getTimezoneOffset()*6e4)/864e5);
+const IV=[0,1,2,4,8,16];
+const app=document.getElementById("app");
+const norm=s=>s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z0-9]/g,"");
+const shuf=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]]}return a};
+let Q=[],cur=null,t0=0,tm=null,nbAns=0,M=null;
+
+function streak(){let n=0,d=day();if(!S.d[d])d--;while(S.d[d]>0){n++;d--}return n}
+function go(t){clearInterval(tm);document.querySelectorAll("nav button").forEach(b=>b.classList.toggle("on",b.dataset.t===t));({home,learn,dico})[t]()}
+document.querySelectorAll("nav button").forEach(b=>b.onclick=()=>go(b.dataset.t));
+
+function home(){
+  const t=day(),due=C.filter(c=>S.c[c.id]&&S.c[c.id].due<=t).length,seen=Object.keys(S.c).length,mast=C.filter(c=>S.c[c.id]&&S.c[c.id].b>=4).length,left=C.length-seen;
+  app.innerHTML=`<h1>Galme</h1><p class="mu">Une séance de 20 minutes par jour : révision, nouveaux mots, exercices.</p>
+  <div class="stats"><div class="st"><b>${streak()}</b>jours d’affilée</div><div class="st"><b>${seen}</b>mots vus sur ${C.length}</div><div class="st"><b>${mast}</b>bien retenus</div></div>
+  <div class="box"><h2>Séance du jour</h2><p class="mu">${due} à réviser · ${Math.min(6,left)} nouveaux mots · ${S.d[t]||0} réponses · ${Math.floor(el()/60)} min aujourd’hui</p>
+  <button class="btn" id="go">${(S.d[t]||0)?"Reprendre une séance":"Commencer la séance"}</button></div>`;
+  document.getElementById("go").onclick=()=>start(6);
+  app.insertAdjacentHTML("beforeend",`<h2 style="margin-top:24px">Autres façons d’apprendre</h2>`+MODES.map(m=>`<button class="ch" data-m="${m[0]}"><b>${m[1]}</b><br><span class="mu" style="font-weight:400">${m[2]}</span></button>`).join(""));
+  app.querySelectorAll("[data-m]").forEach(b=>b.onclick=()=>modes[b.dataset.m]());
+}
+
+function start(nn){
+  const t=day();
+  const due=shuf(C.filter(c=>S.c[c.id]&&S.c[c.id].due<=t)).slice(0,15).map(c=>({id:c.id}));
+  const nw=C.filter(c=>!S.c[c.id]).slice(0,nn).map(c=>({id:c.id,intro:1,nw:1}));
+  M=null;Q=[...due,...nw];if(Q.length){Q.splice(Math.min(Q.length,7),0,{match:1});Q.push({match:1})}t0=Date.now();
+  if(!Q.length){app.innerHTML=`<div class="box"><h2>Tout est à jour</h2><p class="mu">Aucun mot à réviser ni à découvrir pour l’instant. Reviens demain, ou continue maintenant.</p><button class="btn" onclick="modes.libre()">S’entraîner quand même</button><button class="btn alt" onclick="go('home')">Retour</button></div>`;return}
+  clearInterval(tm);tm=setInterval(sec,1000);next();
+}
+function el(){const t=day();if(!S.m||S.m.d!=t)S.m={d:t,s:0};return S.m.s}
+function sec(){if(document.hidden)return;el();S.m.s++;if(S.m.s%5==0)save();if(M&&M.rush&&--M.left<=0)return rushEnd();tick()}
+function tick(){const e=el(),c=document.getElementById("clk"),b=document.getElementById("bar");if(!c)return;if(M&&M.rush){c.textContent=M.left+" s · "+M.pts+" pts";b.style.width=M.left/.6+"%";return}c.textContent=Math.floor(e/60)+":"+String(Math.floor(e%60)).padStart(2,"0")+" / 20:00";b.style.width=Math.min(100,e/12)+"%"}
+const head=()=>`<div class="top"><span id="clk">0:00 / 20:00</span><span>${Q.length+1} restant${Q.length?"s":""}</span></div><div class="bar"><i id="bar"></i></div>`;
+
+function next(){
+  if(M&&M.rush&&!Q.length)Q.push(...M.gen());if(!Q.length)return done();
+  cur=Q.shift();
+  try{cur.intro?intro():cur.match?match():question()}catch(e){go("home")}
+}
+function intro(){
+  const c=C[cur.id];
+  app.innerHTML=head()+`<div class="box"><p class="lab">Nouveau mot · ${U[c.u]}</p><div class="big ${c.g.length>14?"s":""}">${c.g}</div><p class="lab" style="font-size:20px;color:var(--tx)">${c.f}</p><button class="btn" id="ok">Compris, m’interroger</button></div>`;
+  document.getElementById("ok").onclick=()=>{cur.intro=0;question()};tick();
+}
+function question(){
+  const c=C[cur.id],b=S.c[c.id]?S.c[c.id].b:0,sent=c.u==5;
+  const K=cur.k||kind(c,b);if(K==="flip")return flip(c);if(K==="build")return build(c);if(K==="cloze")return cloze(c);if(K==="vf")return vf(c);
+  const typed=K==="type",dir=(typed||K==="fq")?1:0;
+  const pool=C.filter(x=>x.id!=c.id&&(x.u==5)==sent);
+  const seen=new Set([dir?c.g:c.f]),opts=[c];
+  for(const x of shuf(pool)){const k=dir?x.g:x.f;if(!seen.has(k)){seen.add(k);opts.push(x)}if(opts.length==4)break}
+  const pr=dir?c.f:c.g;
+  let h=head()+`<div class="box"><p class="lab">${dir?(typed?"Écris en galme":"Comment dit-on en galme ?"):"Que veut dire…"}</p><div class="big ${pr.length>14?"s":""}">${pr}</div>`;
+  if(typed)h+=`<input type="text" id="in" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Ta réponse"><button class="btn" id="chk">Valider</button>`;
+  else h+=shuf(opts).map(o=>`<button class="ch" data-i="${o.id}">${dir?o.g:o.f}</button>`).join("");
+  app.innerHTML=h+`<div id="fb"></div></div>`;tick();
+  const good=dir?c.g:c.f;
+  if(typed){const i=document.getElementById("in");i.focus();const v=()=>reply(norm(i.value)==norm(c.g),good);document.getElementById("chk").onclick=v;i.onkeydown=e=>{if(e.key==="Enter")v()}}
+  else document.querySelectorAll(".ch").forEach(b=>b.onclick=()=>{document.querySelectorAll(".ch").forEach(x=>{x.disabled=true;if(+x.dataset.i==c.id)x.classList.add("ok")});if(+b.dataset.i!=c.id)b.classList.add("ko");reply(+b.dataset.i==c.id,good)});
+}
+function kind(c,b){const s=c.u==5,r=Math.random();
+  if(s)return b<1?"qf":b<2?(r<.5?"build":"cloze"):r<.34?"fq":r<.67?"build":"cloze";
+  return b<1?"qf":b<2?(r<.5?"qf":"vf"):b<4?(r<.4?"fq":r<.7?"vf":"type"):r<.6?"type":"fq"}
+function shell(l,body){app.innerHTML=head()+`<div class="box"><p class="lab">${l}</p>${body}<div id="fb"></div></div>`;tick()}
+function build(c){
+  const T=c.g.split(" "),ord=shuf(T.map((t,i)=>i)),pick=[];
+  shell("Remets la phrase en galme dans l’ordre",`<div class="big s">${c.f}</div><div class="big s" id="ans" style="min-height:44px;border-bottom:2px dashed var(--bd)"></div><div id="tiles"></div><button class="btn" id="chk">Valider</button><button class="btn alt" id="undo">Effacer</button>`);
+  const draw=()=>{document.getElementById("ans").textContent=pick.map(i=>T[i]).join(" ");document.getElementById("tiles").innerHTML=ord.filter(i=>!pick.includes(i)).map(i=>`<button class="ch" style="display:inline-block;width:auto;margin:4px" data-i="${i}">${T[i]}</button>`).join("");document.querySelectorAll("#tiles .ch").forEach(b=>b.onclick=()=>{pick.push(+b.dataset.i);draw()})};
+  draw();
+  document.getElementById("undo").onclick=()=>{pick.length=0;draw()};
+  document.getElementById("chk").onclick=()=>{if(pick.length<T.length)return;document.getElementById("undo").remove();const ok=norm(pick.map(i=>T[i]).join(""))==norm(c.g);ord.length=0;draw();reply(ok,c.g)}
+}
+function cloze(c){
+  const T=c.g.split(" "),ix=T.map((t,i)=>i).filter(i=>norm(T[i]).length>2),k=ix[Math.random()*ix.length|0],w=T[k],W=norm(w);
+  const ds=[...new Set(shuf(C.filter(x=>x.u<5).map(x=>x.g.split(" ")[0])).filter(x=>norm(x)!=W&&norm(x).length>2))].slice(0,3);
+  shell("Complète la phrase",`<div class="big s">${T.map((t,i)=>i==k?"____":t).join(" ")}</div><p class="lab">${c.f}</p>`+shuf([w,...ds]).map(x=>`<button class="ch" data-w="${x}">${x}</button>`).join(""));
+  document.querySelectorAll(".ch").forEach(b=>b.onclick=()=>{const ok=norm(b.dataset.w)==W;document.querySelectorAll(".ch").forEach(x=>{x.disabled=true;if(norm(x.dataset.w)==W)x.classList.add("ok")});if(!ok)b.classList.add("ko");reply(ok,c.g)})
+}
+function vf(c){
+  const t=Math.random()<.5,o=shuf(C.filter(x=>x.id!=c.id&&x.u==c.u&&x.f!=c.f))[0]||c,f=t?c.f:o.f;
+  shell("Vrai ou faux ?",`<div class="big">${c.g}</div><p class="lab" style="font-size:20px;color:var(--tx)">= ${f} ?</p><button class="ch" data-v="1">Vrai</button><button class="ch" data-v="0">Faux</button>`);
+  document.querySelectorAll(".ch").forEach(b=>b.onclick=()=>{const ok=(b.dataset.v=="1")==t;document.querySelectorAll(".ch").forEach(x=>{x.disabled=true;if((x.dataset.v=="1")==t)x.classList.add("ok")});if(!ok)b.classList.add("ko");reply(ok,c.g+" = "+c.f)})
+}
+function match(){
+  const pool=C.filter(c=>c.u<5&&S.c[c.id]);if(pool.length<4)return next();
+  const L=shuf(pool).slice(0,5),err={};let sel=null,left=L.length;
+  shell("Associe chaque mot à sa traduction",`<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px"><div>${L.map(c=>`<button class="ch" data-s="g" data-i="${c.id}">${c.g}</button>`).join("")}</div><div>${shuf(L).map(c=>`<button class="ch" data-s="f" data-i="${c.id}">${c.f}</button>`).join("")}</div></div>`);
+  document.querySelectorAll(".ch").forEach(b=>b.onclick=()=>{
+    if(b.disabled)return;
+    if(!sel||sel.dataset.s==b.dataset.s){if(sel)sel.style.borderColor="";sel=b;b.style.borderColor="var(--ac)";return}
+    const a=sel,ok=a.dataset.i==b.dataset.i;a.style.borderColor="";sel=null;
+    if(ok){[a,b].forEach(x=>{x.disabled=true;x.classList.add("ok")});S.d[day()]=(S.d[day()]||0)+1;
+      if(!--left){const t=day();L.forEach(c=>{const o=S.c[c.id];if(err[c.id])S.c[c.id]={b:0,due:t};else if(o.due<=t){const n=Math.min(o.b+1,5);S.c[c.id]={b:n,due:t+IV[n]}}});save();
+        document.getElementById("fb").innerHTML=`<p class="fb ok">${Object.keys(err).length?"Terminé, avec quelques erreurs.":"Sans faute."}</p><button class="btn" id="nx">Suivant</button>`;const nx=document.getElementById("nx");nx.focus();nx.onclick=next}}
+    else{err[a.dataset.i]=err[b.dataset.i]=1;[a,b].forEach(x=>x.classList.add("ko"));setTimeout(()=>[a,b].forEach(x=>x.classList.remove("ko")),500)}
+  })
+}
+function reply(ok,good){
+  const c=C[cur.id],t=day();
+  if(ok){if(!cur.w){const o=S.c[c.id],nb=o?Math.min(o.b+1,5):1;S.c[c.id]={b:nb,due:t+IV[nb]}}}
+  else{S.c[c.id]={b:0,due:t};if((cur.n||0)<2)Q.push({id:c.id,w:1,n:(cur.n||0)+1})}
+  S.d[t]=(S.d[t]||0)+1;nbAns++;if(M&&M.rush&&ok)M.pts++;save();
+  const i=document.getElementById("in");if(i)i.disabled=true;
+  const ck=document.getElementById("chk");if(ck)ck.remove();
+  document.getElementById("fb").innerHTML=`<p class="fb ${ok?"ok":"ko"}">${ok?"Correct.":"Réponse : "+good}</p><button class="btn" id="nx">Suivant</button>`;
+  const nx=document.getElementById("nx");nx.focus();nx.onclick=next;
+}
+function done(){
+  clearInterval(tm);save();const m=Math.round(el()/60),left=C.filter(c=>!S.c[c.id]).length;
+  app.innerHTML=`<div class="box"><h2>Séance terminée</h2><p>${nbAns} réponses. Temps passé aujourd’hui : ${m||1} min. Série en cours : <b>${streak()} jour${streak()>1?"s":""}</b>.</p><p class="mu">${m<20?"Il te reste du temps sur tes 20 minutes : tu peux continuer.":"Tes 20 minutes sont faites. À demain."}</p>${left?`<button class="btn" id="more">Apprendre 6 mots de plus</button>`:""}<button class="btn" id="fr">Continuer à s’entraîner</button><button class="btn alt" onclick="go('home')">Menu</button></div>`;
+  nbAns=0;const mo=document.getElementById("more");if(mo)mo.onclick=()=>start(6);document.getElementById("fr").onclick=()=>modes.libre();
+}
+
+const MODES=[["flip","Cartes à retourner","Je devine, puis je vérifie"],["theme","Par thème","Pronoms, verbes, phrases…"],["trad","Traduction de phrases","Écris la phrase en galme"],["rush","Contre la montre","60 secondes, un maximum de points"],["memo","Mémory","Retrouve les paires"],["libre","Entraînement libre","Tout mélangé, sans limite"]];
+const pickC=(f,n)=>shuf(C.filter(f)).slice(0,n);
+const mk=(L,k,i)=>L.map(c=>({id:c.id,k,intro:i&&!S.c[c.id]?1:0}));
+function run(items,o){Q=items;M=o;t0=Date.now();clearInterval(tm);tm=setInterval(sec,1000);next()}
+const modes={
+  flip:()=>run(mk(pickC(c=>c.u<5,12),"flip",0),null),
+  trad:()=>run(mk(pickC(c=>c.u==5,8),"type",1),null),
+  libre:()=>run(mk(pickC(()=>true,20),0,1),null),
+  rush:()=>{const P=C.filter(c=>c.u<5);run([],{rush:1,left:60,pts:0,gen:()=>shuf(P).slice(0,10).map(c=>({id:c.id,k:Math.random()<.5?"qf":"fq"}))})},
+  memo:()=>memo(),
+  theme:()=>{app.innerHTML=`<h1>Choisis un thème</h1>`+U.map((n,u)=>`<button class="ch" data-u="${u}">${n}</button>`).join("")+`<button class="btn alt" onclick="go('home')">Retour</button>`;app.querySelectorAll("[data-u]").forEach(b=>b.onclick=()=>run(mk(pickC(c=>c.u==+b.dataset.u,12),0,1),null))}
+};
+function flip(c){
+  const d=Math.random()<.5,a=d?c.f:c.g,r=d?c.g:c.f;
+  shell(d?"Comment dit-on en galme ?":"Que veut dire…",`<div class="big ${a.length>14?"s":""}">${a}</div><button class="btn" id="rv">Voir la réponse</button>`);
+  document.getElementById("rv").onclick=()=>{document.getElementById("rv").outerHTML=`<div class="big s" style="color:var(--ac)">${r}</div><button class="ch" data-v="1">Je savais</button><button class="ch" data-v="0">À revoir</button>`;document.querySelectorAll(".ch").forEach(b=>b.onclick=()=>{document.querySelectorAll(".ch").forEach(x=>x.disabled=true);reply(b.dataset.v=="1",r)})}
+}
+function rushEnd(){
+  clearInterval(tm);const p=M.pts,bst=Math.max(S.rb||0,p);S.rb=bst;save();
+  app.innerHTML=`<div class="box"><h2>Temps écoulé</h2><p>${p} bonnes réponses. Record : <b>${bst}</b>.</p><button class="btn" id="ag">Rejouer</button><button class="btn alt" onclick="go('home')">Menu</button></div>`;
+  document.getElementById("ag").onclick=modes.rush;
+}
+function memo(N=10){
+  M=null;clearInterval(tm);
+  const T=shuf(pickC(c=>c.u<5,N).flatMap(c=>[{i:c.id,t:c.g},{i:c.id,t:c.f}]));
+  let a=null,n=0,mv=0,lock=0;
+  app.innerHTML=`<h1>Mémory</h1><p class="mu">Retrouve les paires galme / français.</p><div style="display:flex;gap:6px;margin-bottom:10px">${[6,10,15,20].map(k=>`<button class="ch${k==N?" ok":""}" style="margin:0;text-align:center;padding:10px 4px" data-n="${k}">${k} paires</button>`).join("")}</div><div id="mg" style="display:grid;grid-template-columns:repeat(${N>6?4:3},1fr);gap:8px">${T.map((x,k)=>`<button class="ch" data-k="${k}" style="min-height:64px;text-align:center;padding:6px;font-size:${N>6?14:16}px;overflow-wrap:anywhere">?</button>`).join("")}</div><div id="mr"></div>`;
+  document.querySelectorAll("[data-n]").forEach(b=>b.onclick=()=>memo(+b.dataset.n));
+  document.querySelectorAll("#mg .ch").forEach(b=>b.onclick=()=>{
+    if(lock||b.disabled||b===a)return;
+    b.textContent=T[b.dataset.k].t;
+    if(!a){a=b;return}
+    mv++;const x=a;a=null;
+    if(T[x.dataset.k].i==T[b.dataset.k].i){[x,b].forEach(y=>{y.disabled=true;y.classList.add("ok")});
+      if(++n==N){const t=day();S.d[t]=(S.d[t]||0)+N;save();document.getElementById("mr").innerHTML=`<p class="fb ok">Bravo : ${mv} coups.</p><button class="btn" id="re">Rejouer</button><button class="btn alt" onclick="go('home')">Menu</button>`;document.getElementById("re").onclick=()=>memo(N)}}
+    else{lock=1;setTimeout(()=>{[x,b].forEach(y=>y.textContent="?");lock=0},900)}
+  })
+}
+function learn(){
+  let h=`<h1>Leçons</h1><p class="note">${P}</p>`;
+  U.forEach((n,u)=>{
+    const L=C.filter(c=>c.u==u);
+    h+=`<details${u==1?" open":""}><summary>${n} (${L.length})</summary><p class="note">${N[u]}</p><table>${L.map(c=>{const o=S.c[c.id],k=o?(o.b>=4?"hi":"on"):"";return`<tr><td>${c.g}</td><td><span class="dot ${k}"></span>${c.f}</td></tr>`}).join("")}</table></details>`;
+  });
+  app.innerHTML=h;
+}
+function dico(){
+  app.innerHTML=`<h1>Dictionnaire</h1><input type="search" id="q" placeholder="Chercher en galme ou en français" aria-label="Rechercher"><div id="tf" style="display:flex;flex-wrap:wrap;gap:6px;margin:10px 0"></div><div id="res"></div>`;
+  const q=document.getElementById("q"),r=document.getElementById("res");
+  let tp="";const f=()=>{const v=norm(q.value),L=C.filter(c=>!v||norm(c.g).includes(v)||norm(c.f).includes(v)).sort((a,b)=>norm(a.g).localeCompare(norm(b.g)));const G=TO.filter(t=>(!tp||t==tp)&&L.some(c=>c.t==t));r.innerHTML=G.map(t=>`<h2 style="margin-top:18px">${TT[t]}</h2><table>${L.filter(c=>c.t==t).map(c=>`<tr><td>${c.g}</td><td>${c.f}</td></tr>`).join("")}</table>`).join("")||`<p class="mu">Aucun résultat.</p>`;document.getElementById("tf").innerHTML=["Tout",...TO].map(t=>`<button class="ch${(t=="Tout"?"":t)==tp?" ok":""}" style="margin:0;width:auto;padding:6px 12px;font-size:14px" data-t="${t}">${t}</button>`).join("");document.querySelectorAll("#tf .ch").forEach(b=>b.onclick=()=>{tp=b.dataset.t=="Tout"?"":b.dataset.t;f()})};
+  q.oninput=f;f();
+}
+home();
+</script>
+</body>
+</html>
